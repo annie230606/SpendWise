@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+flask
+requests
+twilio
+supabase
+pandas
+langgraph
+openai
+matplotlib
+seaborn
+python-multipart
+python-dotenv
+pyjwt
