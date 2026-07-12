@@ -71,22 +71,31 @@ def generate_coaching_message(merchant: str, amount: float, breached_category: s
     llm = get_llm()
     limits_text = "\n".join([f"• {c}: New limit ₹{round(l)}" for c, l in proposed_limits.items()])
     prompt = (
-        "<|system|>\nYou are a friendly, concise AI financial coach on WhatsApp. "
-        "The user just spent ₹{amount} at {merchant} in '{breached_category}', which is pushing their budget. "
-        "Write a short, encouraging text. "
-        "RULES:\n"
-        "1. NO formal greetings (no 'Hello', no 'Dear', no 'I hope...').\n"
-        "2. NO professional signatures (no 'Best regards', no 'Financial Coach', no '[Your Name]').\n"
-        "3. Use emojis to be friendly.\n"
-        "4. Suggest these limits:\n{limits_text}\n"
-        "5. End with exactly: 'Type Confirm to apply.'\n"
-        "<|user|>\nGenerate the WhatsApp alert.\n<|assistant|>\n"
+        "<|system|>\n"
+        "You are a friendly, concise AI financial coach on WhatsApp. "
+        "The user just overspent in '{breached_category}' (₹{amount} at {merchant}). "
+        "Your message MUST follow this exact structure:\n"
+        "1. One short sentence acknowledging the spend with an emoji.\n"
+        "2. State the new proposed budget limits EXACTLY as shown below — do NOT skip or paraphrase them:\n"
+        "{limits_text}\n"
+        "3. End with exactly this line: 'Type Confirm to apply.'\n"
+        "RULES: No greetings, no sign-offs, no 'Dear', no 'Best regards'. Use emojis.\n"
+        "<|user|>\nWrite the WhatsApp alert now.\n<|assistant|>\n"
     )
     try:
-        response = llm(prompt.format(amount=amount, merchant=merchant, breached_category=breached_category, limits_text=limits_text), max_tokens=300, temperature=0.7)
+        response = llm(
+            prompt.format(amount=amount, merchant=merchant, breached_category=breached_category, limits_text=limits_text),
+            max_tokens=350,
+            temperature=0.5,
+        )
         return response["choices"][0]["text"].strip()
-    except:
-        return f"⚠️ Sustainability Alert: Limits updated. Reply 'Confirm' to apply."
+    except Exception:
+        fallback_lines = [f"⚠️ Budget alert! You spent ₹{amount} at {merchant}."]
+        if proposed_limits:
+            fallback_lines.append("Proposed new limits:")
+            fallback_lines.extend([f"• {c}: New limit ₹{round(l)}" for c, l in proposed_limits.items()])
+        fallback_lines.append("Type Confirm to apply.")
+        return "\n".join(fallback_lines)
 
 def process_automated_transaction(phone_number: str, amount: float, category: str, merchant: str) -> dict:
     budgets = get_budgets(phone_number)

@@ -3,7 +3,7 @@ import secrets
 import time
 from langgraph.graph import StateGraph, END
 from agent.coach import apply_confirmed_budget
-from agent.auditor import process_transaction
+from agent.auditor import parse_and_process_message
 from database.client import (
     get_user, create_user, update_user_status, set_mfa_code, delete_user_data, 
     get_budgets, update_user_savings_goal, create_budget
@@ -86,7 +86,7 @@ def verify_reset_node(state: AgentState) -> AgentState:
 # --- TRANSACTION NODES ---
 
 def handle_transaction_node(state: AgentState) -> AgentState:
-    result = process_transaction(state["phone_number"], state["message"])
+    result = parse_and_process_message(state["phone_number"], state["message"])
     # If it is NOT a danger/alert, return empty string for silence
     return {**state, "response_text": result.get("alert_msg", "")}
 
