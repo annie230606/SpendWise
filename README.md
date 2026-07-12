@@ -46,8 +46,8 @@ To ensure financial privacy, SpendWise uses an **In-Process LLM (Phi-3-mini-4k-i
 ---
 
 ### 🎥 Demo & Visuals
-* **Demo Video:** [Insert Link Here]
-* **Screenshots:** [Insert Link Here]
+* **Demo Video:** [coming soon]
+* **Screenshots:** [coming soon]
 
 ### 🚧 Future Scope & Limitations
 * **Limitations:** Requires sufficient local RAM for the LLM to perform audits quickly.
