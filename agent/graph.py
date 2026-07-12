@@ -78,10 +78,25 @@ def initiate_reset_node(state: AgentState) -> AgentState:
 
 def verify_reset_node(state: AgentState) -> AgentState:
     user = get_user(state["phone_number"])
+    mfa_expires_at = user.get("mfa_expires_at")
+
+    # Check if the MFA code has expired
+    if mfa_expires_at:
+        import datetime
+        expiry = datetime.datetime.fromisoformat(mfa_expires_at)
+        if expiry.tzinfo is None:
+            expiry = expiry.replace(tzinfo=datetime.timezone.utc)
+        if datetime.datetime.now(datetime.timezone.utc) > expiry:
+            update_user_status(state["phone_number"], "ONBOARDED")
+            return {**state, "response_text": "⏰ Code expired. Reset cancelled. You can send /reset-all-data again to try."}
+
     if state["message"].strip() == user.get("mfa_code"):
         delete_user_data(state["phone_number"])
         return {**state, "response_text": "🗑️ Done. All budgets and history have been permanently deleted. Text me anything to restart fresh."}
-    return {**state, "response_text": "Invalid code. Reset cancelled."}
+
+    # Wrong code — reset status so the user isn't stuck in AWAITING_MFA
+    update_user_status(state["phone_number"], "ONBOARDED")
+    return {**state, "response_text": "❌ Invalid code. Reset cancelled."}
 
 # --- TRANSACTION NODES ---
 
