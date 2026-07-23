@@ -191,7 +191,7 @@ Expected result: the Auditor extracts `{"amount": 500.00, "category": "Food & Di
 
 ## Demo
 
-Demo video and screenshots: https://drive.google.com/drive/folders/1KGVj-Zla1izhoSc_UfcaHCaSWnS176BY?usp=sharing
+Demo video and screenshots: https://drive.google.com/drive/folders/1M9XXnlRoL3HQMefjlnUqt9DDoPPlAYt8?usp=sharing
 
 ## Future scope and limitations
 
